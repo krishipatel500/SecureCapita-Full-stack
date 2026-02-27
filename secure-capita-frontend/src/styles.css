@@ -1,0 +1,105 @@
+/* Global styles for auth pages */
+:root {
+  --bg: #0f1724;
+  --card: linear-gradient(135deg, #0f1724 0%, #111827 100%);
+  --accent: linear-gradient(90deg, #f8bec3, #ffc371);
+  --muted: #94a3b8;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family:
+    Inter,
+    system-ui,
+    Segoe UI,
+    Roboto,
+    Arial;
+}
+body {
+  background:
+    radial-gradient(1000px 600px at 10% 10%, rgba(119, 2, 255, 0.08), transparent), #f7fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container {
+  width: 100%;
+  max-width: 420px;
+  margin: 1rem;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff, #f8fafc);
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.brand {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+}
+h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+}
+.form-group label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+.form-control {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e6edf3;
+  font-size: 0.95rem;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.9rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #7f00ff, #e100ff);
+  color: #fff;
+  border: 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn.secondary {
+  background: transparent;
+  color: #334155;
+  border: 1px solid #e6edf3;
+}
+.links {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+.error {
+  color: #ef4444;
+  font-size: 0.85rem;
+}
+.small {
+  font-size: 0.85rem;
+  color: var(--muted);
+}

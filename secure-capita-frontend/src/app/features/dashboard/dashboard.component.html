@@ -1,0 +1,176 @@
+<div class="dashboard-container">
+
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <div>
+      <h1>Welcome back 👋</h1>
+      <p>Here's what's happening in your business today.</p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+
+    <div class="stat-card blue">
+      <div class="stat-icon">👥</div>
+      <div>
+        <span>Total Customers</span>
+        <h2>{{ stats.totalCustomers }}</h2>
+      </div>
+    </div>
+
+    <div class="stat-card orange">
+      <div class="stat-icon">📄</div>
+      <div>
+        <span>Total Invoices</span>
+        <h2>{{ stats.totalInvoices }}</h2>
+      </div>
+    </div>
+
+    <div class="stat-card green">
+      <div class="stat-icon">💰</div>
+      <div>
+        <span>Total Billed</span>
+        <h2>₹{{ stats.totalBilled | number }}</h2>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="customers-section">
+
+    <div class="section-header">
+      <h2>Recent Customers</h2>
+      <a routerLink="/customers">View All</a>
+    </div>
+
+    <div *ngIf="isLoading" class="loader"></div>
+
+    <div *ngIf="!isLoading && customers.length > 0" class="table-wrapper">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Type</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let customer of customers">
+            <td class="customer-cell">
+              <img [src]="customer.imageUrl || 'https://i.pravatar.cc/40'" />
+              <div>
+                <strong>{{ customer.name }}</strong>
+                <small>{{ customer.email }}</small>
+              </div>
+            </td>
+
+            <td>
+              <span class="badge"
+                [ngClass]="customer.status.toLowerCase()">
+                {{ customer.status }}
+              </span>
+            </td>
+
+            <td>{{ customer.type }}</td>
+
+            <td>
+              <button (click)="viewCustomer(customer.id)">
+                View
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <div *ngIf="!isLoading && customers.length === 0" class="no-data">
+      No customers found.
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================
+     CUSTOMERS SECTION
+========================= -->
+
+<div class="customers-section">
+
+  <div class="section-header">
+    <h2>Customers</h2>
+    <a routerLink="/customers" class="view-all">View All</a>
+  </div>
+
+  <div class="table-wrapper" *ngIf="customers.length > 0; else noCustomers">
+
+    <table class="customers-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Photo</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let customer of customers">
+
+          <td>{{ customer.id }}</td>
+
+          <td>
+            <img
+              [src]="customer.imageUrl || 'https://i.pravatar.cc/40'"
+              class="customer-img"
+              alt="customer"
+            />
+          </td>
+
+          <td>{{ customer.name }}</td>
+          <td>{{ customer.email }}</td>
+          <td>{{ customer.phone }}</td>
+
+          <td>
+            <span class="badge"
+              [ngClass]="{
+                active: customer.status === 'ACTIVE',
+                inactive: customer.status === 'INACTIVE',
+                pending: customer.status === 'PENDING'
+              }">
+              {{ customer.status }}
+            </span>
+          </td>
+
+          <td>{{ customer.type }}</td>
+
+          <td>
+            <button class="view-btn" (click)="viewCustomer(customer.id)">
+              View
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <ng-template #noCustomers>
+    <p class="no-data">No customers found.</p>
+  </ng-template>
+
+</div>

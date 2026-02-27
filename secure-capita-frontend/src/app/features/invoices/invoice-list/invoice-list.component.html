@@ -1,0 +1,82 @@
+<div class="invoice-list-container">
+
+  <div class="breadcrumb">
+    <a (click)="goToDashboard()" class="breadcrumb-link">Home</a>
+    <span class="divider">/</span>
+    <span class="breadcrumb-current">Invoices</span>
+  </div>
+
+  <div class="main-content">
+    <div class="content-header">
+      <h2>Invoices</h2>
+    </div>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search by invoice number, customer, status..."
+        [value]="searchTerm"
+        (input)="onSearchChange($any($event.target).value)"
+      />
+    </div>
+
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Invoices Retrieved</p>
+    </div>
+
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="table-card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice Number</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let inv of invoices">
+              <td class="mono">{{ inv.invoiceNumber || inv.id }}</td>
+              <td class="service">{{ inv.service || inv.description || '-' }}</td>
+              <td>
+                <span class="status" [class]="getStatusClass(inv.status)">
+                  {{ inv.status || 'PENDING' }}
+                </span>
+              </td>
+              <td>{{ inv.date || inv.invoiceDate || '-' }}</td>
+              <td class="mono">${{ (inv.total ?? inv.amount ?? 0) | number:'1.2-2' }}</td>
+              <td class="actions">
+                <button class="btn btn-secondary" (click)="printInvoice(inv)">Print</button>
+                <button class="btn btn-primary" (click)="viewInvoice(inv)">View</button>
+              </td>
+            </tr>
+            <tr *ngIf="invoices.length === 0">
+              <td colspan="6" class="no-data">No invoices found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="totalPages > 1" class="pagination">
+        <button class="pagination-btn" [disabled]="currentPage === 0" (click)="goToPage(currentPage - 1)">
+          ← Prev
+        </button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+        <button class="pagination-btn" [disabled]="currentPage >= totalPages - 1" (click)="goToPage(currentPage + 1)">
+          Next →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

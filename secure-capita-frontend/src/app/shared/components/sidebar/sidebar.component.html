@@ -1,0 +1,15 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+
+  <div class="sidebar-header">
+    <span *ngIf="!isCollapsed">SecureCapita</span>
+    <button (click)="toggleSidebar()">☰</button>
+  </div>
+
+  <nav class="menu">
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/customers" routerLinkActive="active">Customers</a>
+    <a routerLink="/invoices" routerLinkActive="active">Invoices</a>
+    <a routerLink="/profile" routerLinkActive="active">Profile</a>
+  </nav>
+
+</aside>

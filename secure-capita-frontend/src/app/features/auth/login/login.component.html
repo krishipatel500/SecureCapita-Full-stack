@@ -1,0 +1,115 @@
+<div class="container">
+  <div class="card-header">
+    <div class="brand">SC</div>
+    <div>
+      <h2>Welcome Back</h2>
+      <div class="small">Sign in to your account</div>
+    </div>
+  </div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <!-- Server Error Alert (Top) -->
+    <div *ngIf="serverError" class="server-error-box" role="alert" aria-live="polite" aria-atomic="true">
+      <div class="error-content">
+        <span class="error-icon">✕</span>
+        <div class="error-message-container">
+          <strong>Login Failed</strong>
+          <p>{{ serverError }}</p>
+        </div>
+        <button type="button" class="close-btn" (click)="serverError = ''" aria-label="Close error message">×</button>
+      </div>
+    </div>
+
+    <!-- Email Field -->
+    <div class="form-group">
+      <label for="email" class="form-label">Email</label>
+      <input
+        id="email"
+        class="form-control"
+        type="email"
+        placeholder="you@domain.com"
+        formControlName="email"
+        (blur)="markFieldTouched('email')"
+        [class.invalid]="email?.invalid && email?.touched"
+        [class.valid]="email?.valid && email?.touched"
+        [attr.aria-invalid]="email?.invalid && email?.touched"
+        aria-describedby="email-error">
+
+      <!-- Email Error Messages -->
+      <div *ngIf="email?.invalid && email?.touched" id="email-error" class="error-box" role="alert">
+        <div *ngIf="email?.errors?.['required']" class="error-item">
+          <span class="error-icon">⚠️</span> Email is required
+        </div>
+        <div *ngIf="email?.errors?.['email']" class="error-item">
+          <span class="error-icon">⚠️</span> Invalid email format
+        </div>
+        <div *ngIf="email?.errors?.['maxlength']" class="error-item">
+          <span class="error-icon">⚠️</span> Email is too long
+        </div>
+      </div>
+    </div>
+
+    <!-- Password Field -->
+    <div class="form-group">
+      <label for="password" class="form-label">Password</label>
+      <input
+        id="password"
+        class="form-control"
+        type="password"
+        placeholder="••••••••"
+        formControlName="password"
+        (blur)="markFieldTouched('password')"
+        [class.invalid]="password?.invalid && password?.touched"
+        [class.valid]="password?.valid && password?.touched"
+        [attr.aria-invalid]="password?.invalid && password?.touched"
+        aria-describedby="password-error">
+
+      <!-- Password Error Messages -->
+      <div *ngIf="password?.invalid && password?.touched" id="password-error" class="error-box" role="alert">
+        <div *ngIf="password?.errors?.['required']" class="error-item">
+          <span class="error-icon">⚠️</span> Password is required
+        </div>
+        <div *ngIf="password?.errors?.['minlength']" class="error-item">
+          <span class="error-icon">⚠️</span> Password must be at least 6 characters ({{password?.errors?.['minlength']?.requiredLength}})
+        </div>
+        <div *ngIf="password?.errors?.['maxlength']" class="error-item">
+          <span class="error-icon">⚠️</span> Password is too long
+        </div>
+      </div>
+    </div>
+
+    <!-- Server Error Alert -->
+    <div *ngIf="serverError" class="server-error-box" role="alert" aria-live="polite" aria-atomic="true">
+      <div class="error-content">
+        <span class="error-icon">✕</span>
+        <div class="error-message-container">
+          <strong>Login Failed</strong>
+          <p>{{ serverError }}</p>
+        </div>
+        <button type="button" class="close-btn" (click)="serverError = ''" aria-label="Close error message">×</button>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="button-group">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="loginForm.invalid || isLoading"
+        [class.loading]="isLoading">
+        <span *ngIf="!isLoading" class="btn-text">Login</span>
+        <span *ngIf="isLoading" class="btn-text loading-text">
+          <span class="spinner"></span> Logging in...
+        </span>
+      </button>
+    </div>
+
+    <div class="form-footer">
+      <a class="forgot-link" routerLink="/forgot-password">Forgot password?</a>
+    </div>
+
+    <div class="links">
+      <div class="small">Don't have an account? <a class="auth-link" routerLink="/register">Create one</a></div>
+    </div>
+  </form>
+</div>

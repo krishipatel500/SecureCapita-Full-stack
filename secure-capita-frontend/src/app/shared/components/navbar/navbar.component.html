@@ -1,0 +1,54 @@
+<header class="navbar">
+
+  <div class="logo" routerLink="/dashboard">
+    <span class="logo-icon">SC</span>
+    <span class="logo-text">SecureCapita</span>
+  </div>
+
+  <!-- LEFT NAV -->
+  <div class="nav-links">
+
+    <!-- Customers Dropdown -->
+    <div class="dropdown-wrapper">
+      <div class="nav-item" (click)="toggleMenu('customers')">
+        Customers ▾
+      </div>
+
+      <div class="dropdown-menu" *ngIf="isCustomersOpen">
+        <button (click)="navigate('/customers')">View Customers</button>
+        <button (click)="navigate('/customers/new')">Add Customer</button>
+      </div>
+    </div>
+
+    <!-- Invoices Dropdown -->
+    <div class="dropdown-wrapper">
+      <div class="nav-item" (click)="toggleMenu('invoices')">
+        Invoices ▾
+      </div>
+
+      <div class="dropdown-menu" *ngIf="isInvoicesOpen">
+        <button (click)="navigate('/invoices')">View Invoices</button>
+        <button (click)="navigate('/invoices/new')">Add Invoice</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PROFILE RIGHT -->
+  <div class="dropdown-wrapper profile-section">
+
+    <div class="profile-trigger" (click)="toggleMenu('profile')">
+      <div class="avatar">
+        {{ userEmail.charAt(0).toUpperCase() }}
+      </div>
+      <span class="email">{{ userEmail }}</span>
+    </div>
+
+    <div class="dropdown-menu right" *ngIf="isProfileOpen">
+      <button (click)="navigate('/profile')">Profile</button>
+      <button (click)="logout()">Logout</button>
+    </div>
+
+  </div>
+
+</header>

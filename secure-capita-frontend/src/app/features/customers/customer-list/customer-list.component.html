@@ -1,0 +1,112 @@
+<div class="customer-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2>Customers</h2>
+
+    <div class="actions">
+      <button class="btn btn-success" (click)="exportToExcel()">
+        📊 Export Excel
+      </button>
+
+      <button class="btn btn-primary" routerLink="/customers/new">
+        ➕ Add Customer
+      </button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search customers..."
+      (input)="onSearchChange($any($event.target).value)"
+    />
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper">
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Photo</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let customer of customers">
+
+          <td>{{ customer.id }}</td>
+
+          <td>
+            <img
+              [src]="customer.imageUrl || 'https://i.pravatar.cc/40'"
+              class="avatar-img"
+            />
+          </td>
+
+          <td>{{ customer.name }}</td>
+          <td>{{ customer.email }}</td>
+          <td>{{ customer.phone }}</td>
+
+          <td>
+            <span
+              class="badge"
+              [ngClass]="customer.status?.toLowerCase()">
+              {{ customer.status }}
+            </span>
+          </td>
+
+          <td>{{ customer.type }}</td>
+
+          <td>
+            <button class="view-btn"
+              (click)="viewCustomer(customer.id)">
+              View
+            </button>
+          </td>
+
+        </tr>
+
+        <tr *ngIf="customers.length === 0">
+          <td colspan="8" class="no-data">
+            No customers found
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button
+      [disabled]="currentPage === 0"
+      (click)="goToPage(currentPage - 1)">
+      ← Prev
+    </button>
+
+    <button
+      *ngFor="let page of getPageNumbers()"
+      [class.active]="page === currentPage"
+      (click)="goToPage(page)">
+      {{ page + 1 }}
+    </button>
+
+    <button
+      [disabled]="currentPage >= totalPages - 1"
+      (click)="goToPage(currentPage + 1)">
+      Next →
+    </button>
+  </div>
+
+</div>

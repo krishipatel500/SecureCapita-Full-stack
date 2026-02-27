@@ -1,0 +1,66 @@
+<div class="verify-container">
+  <div class="verify-wrapper">
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="verify-content">
+        <div class="spinner-wrapper">
+          <div class="spinner"></div>
+        </div>
+        <h2>Verifying Your Email</h2>
+        <p class="subtitle">Please wait while we verify your account...</p>
+      </div>
+    }
+
+    <!-- Success State -->
+    @if (isVerified() && successMessage()) {
+      <div class="verify-content success-state">
+        <div class="icon-wrapper success">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="check-circle">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2>Email Verified Successfully!</h2>
+        <div class="success-message" role="status">
+          {{ successMessage() }}
+        </div>
+        <p class="subtitle">Your account is now active and ready to use.</p>
+
+        <div class="action-buttons">
+          <button (click)="goToLogin()" class="btn btn-primary" type="button">
+            Login to Your Account
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (!isLoading() && !isVerified() && errorMessage()) {
+      <div class="verify-content error-state">
+        <div class="icon-wrapper error">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="error-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 2.805A9 9 0 0112 2.25a9 9 0 018.303 14.805M9 21h6m0 0a3 3 0 01-3 3 3 3 0 01-3-3m6 0a3 3 0 01-3 3 3 3 0 01-3-3" />
+          </svg>
+        </div>
+        <h2>Verification Failed</h2>
+        <div class="error-message" role="alert">
+          {{ errorMessage() }}
+        </div>
+
+        <div class="action-buttons">
+          <button (click)="retryVerification()" class="btn btn-secondary" type="button">
+            Try Again
+          </button>
+          <button (click)="goToRegister()" class="btn btn-outline" type="button">
+            Register Again
+          </button>
+        </div>
+
+        <p class="help-text">
+          If you continue to experience issues, please <a href="mailto:support@example.com" class="help-link">contact support</a>.
+        </p>
+      </div>
+    }
+
+  </div>
+</div>

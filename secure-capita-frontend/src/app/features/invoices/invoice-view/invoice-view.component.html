@@ -1,0 +1,110 @@
+<div class="invoice-wrapper" *ngIf="!isLoading">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb no-print">
+    <a (click)="goToDashboard()">Home</a> /
+    <a (click)="goToInvoices()">Invoices</a> /
+    <span>{{ invoice?.invoiceNumber }}</span>
+  </div>
+
+  <div class="invoice-paper">
+
+    <!-- Top Toolbar -->
+    <div class="top-bar no-print">
+      <button class="btn-export" (click)="exportPdf()">Export as PDF</button>
+    </div>
+
+    <!-- HEADER GRID -->
+    <div class="header-grid">
+
+      <!-- FROM -->
+      <div>
+        <h6>from</h6>
+        <h3>SecureCapita, Inc.</h3>
+        <p>123 Main Street</p>
+        <p>Ahmedabad, Gujarat 380001</p>
+        <p>Phone: +91 9999999999</p>
+      </div>
+
+      <!-- TO -->
+      <!-- TO -->
+<div>
+  <h6>to</h6>
+  <h3>{{ invoice?.customerName }}</h3>
+  <p>Email: {{ invoice?.customerEmail }}</p>
+  <p>Phone: {{ invoice?.customerPhone }}</p>
+
+  <p>
+    Status:
+    <span class="status-pill"
+          [class.paid]="invoice?.status==='PAID'"
+          [class.overdue]="invoice?.status==='OVERDUE'">
+      {{ invoice?.status || 'PENDING' }}
+    </span>
+  </p>
+</div>
+      <!-- META -->
+      <div class="meta">
+        <p><strong>Invoice Number:</strong> {{ invoice?.invoiceNumber }}</p>
+       <p><strong>Invoice Date:</strong> {{ invoice?.invoiceDate }}</p>
+        <p><strong>Due Date:</strong> {{ invoice?.dueDate }}</p>
+      </div>
+
+    </div>
+
+    <!-- SERVICES TABLE -->
+    <div class="services-table">
+
+      <div class="table-head">
+        <div>#</div>
+        <div>Provided Services</div>
+        <div class="right">Rate</div>
+        <div class="right">Total</div>
+      </div>
+
+      <div class="table-row" *ngFor="let item of items; let i = index">
+        <div>{{ i + 1 }}</div>
+        <div>{{ item.name || item.service }}</div>
+        <div class="right">
+          ₹ {{ (item.price || item.rate) | number:'1.2-2' }}
+        </div>
+        <div class="right">
+          ₹ {{
+            ((item.price || item.rate) * (item.quantity || 1))
+            | number:'1.2-2'
+          }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TOTALS -->
+    <div class="totals-section">
+
+      <div class="totals-left">
+        <div>
+          <span>SUBTOTAL</span>
+          <strong>₹ {{ subTotal | number:'1.2-2' }}</strong>
+        </div>
+
+        <div>
+          <span>TAX (5.4%)</span>
+          <strong>₹ {{ taxAmount | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+
+      <div class="grand-box">
+        <span>TOTAL</span>
+        <h2>₹ {{ grandTotal | number:'1.2-2' }}</h2>
+      </div>
+
+    </div>
+
+    <div class="footer-note">
+      THANK YOU FOR YOUR BUSINESS
+      <p>securecapita.org</p>
+      <p>billing@securecapita.org</p>
+    </div>
+
+  </div>
+</div>
