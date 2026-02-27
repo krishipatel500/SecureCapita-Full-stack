@@ -27,32 +27,86 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final CustomerRepository customerRepository;
 
+    // =========================
+    // LIST INVOICES
+    // =========================
     @Override
     public Page<InvoiceResponse> listInvoices(User user, Long customerId, Pageable pageable) {
+
         Page<Invoice> page = (customerId == null)
                 ? invoiceRepository.findByCustomer_User(user, pageable)
                 : invoiceRepository.findByCustomer_IdAndCustomer_User(customerId, user, pageable);
+
         return page.map(this::toResponse);
     }
 
+    // =========================
+    // GET SINGLE INVOICE
+    // =========================
     @Override
     public InvoiceResponse getInvoice(User user, Long invoiceId) {
+
         Invoice invoice = invoiceRepository.findByIdAndCustomer_User(invoiceId, user)
-                .orElseThrow(() -> new CustomException("Invoice not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() ->
+                        new CustomException("Invoice not found", HttpStatus.NOT_FOUND));
+
         return toResponse(invoice);
     }
 
     @Override
     public InvoiceResponse getInvoiceByNumber(User user, String invoiceNumber) {
-        Invoice invoice = invoiceRepository.findByInvoiceNumberAndCustomer_User(invoiceNumber, user)
-                .orElseThrow(() -> new CustomException("Invoice not found", HttpStatus.NOT_FOUND));
+
+        Invoice invoice = invoiceRepository
+                .findByInvoiceNumberAndCustomer_User(invoiceNumber, user)
+                .orElseThrow(() ->
+                        new CustomException("Invoice not found", HttpStatus.NOT_FOUND));
+
         return toResponse(invoice);
     }
 
+    // =========================
+    // CUSTOMER SUMMARY (NEW)
+    // =========================
+    @Override
+    public CustomerInvoiceSummaryResponse getCustomerInvoiceSummary(User user, Long customerId) {
+
+        Customer customer = customerRepository.findByIdAndUser(customerId, user)
+                .orElseThrow(() ->
+                        new CustomException("Customer not found", HttpStatus.NOT_FOUND));
+
+        List<Invoice> invoices =
+                invoiceRepository.findByCustomerAndCustomer_User(customer, user);
+
+        BigDecimal totalBilled = invoices.stream()
+                .map(Invoice::getTotal)
+                .filter(total -> total != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalPaid = invoices.stream()
+                .filter(inv -> "PAID".equals(inv.getStatus().name()))
+                .map(Invoice::getTotal)
+                .filter(total -> total != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalUnpaid = totalBilled.subtract(totalPaid);
+
+        return CustomerInvoiceSummaryResponse.builder()
+                .totalInvoices((long) invoices.size())
+                .totalBilled(totalBilled.doubleValue())
+                .totalPaid(totalPaid.doubleValue())
+                .totalUnpaid(totalUnpaid.doubleValue())
+                .build();
+    }
+
+    // =========================
+    // CREATE INVOICE
+    // =========================
     @Override
     public InvoiceResponse createInvoice(User user, CreateInvoiceRequest request) {
+
         Customer customer = customerRepository.findByIdAndUser(request.getCustomerId(), user)
-                .orElseThrow(() -> new CustomException("Customer not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() ->
+                        new CustomException("Customer not found", HttpStatus.NOT_FOUND));
 
         Invoice invoice = Invoice.builder()
                 .invoiceNumber(generateInvoiceNumber())
@@ -63,44 +117,68 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         applyServicesAndRecalculate(invoice, request.getServices());
 
-        Invoice saved = invoiceRepository.save(invoice);
-        return toResponse(saved);
+        return toResponse(invoiceRepository.save(invoice));
     }
 
+    // =========================
+    // UPDATE INVOICE
+    // =========================
     @Override
     public InvoiceResponse updateInvoice(User user, Long invoiceId, UpdateInvoiceRequest request) {
+
         Invoice invoice = invoiceRepository.findByIdAndCustomer_User(invoiceId, user)
-                .orElseThrow(() -> new CustomException("Invoice not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() ->
+                        new CustomException("Invoice not found", HttpStatus.NOT_FOUND));
 
-        if (request.getInvoiceDate() != null) invoice.setInvoiceDate(request.getInvoiceDate());
-        if (request.getStatus() != null) invoice.setStatus(request.getStatus());
+        if (request.getInvoiceDate() != null)
+            invoice.setInvoiceDate(request.getInvoiceDate());
 
-        if (request.getServices() != null) {
+        if (request.getStatus() != null)
+            invoice.setStatus(request.getStatus());
+
+        if (request.getServices() != null)
             applyServicesAndRecalculate(invoice, request.getServices());
-        } else {
+        else
             invoice.setTotal(recalculateTotal(invoice.getServices()));
-        }
 
-        Invoice saved = invoiceRepository.save(invoice);
-        return toResponse(saved);
+        return toResponse(invoiceRepository.save(invoice));
     }
 
+    // =========================
+    // DELETE INVOICE
+    // =========================
     @Override
     public void deleteInvoice(User user, Long invoiceId) {
+
         Invoice invoice = invoiceRepository.findByIdAndCustomer_User(invoiceId, user)
-                .orElseThrow(() -> new CustomException("Invoice not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() ->
+                        new CustomException("Invoice not found", HttpStatus.NOT_FOUND));
+
         invoiceRepository.delete(invoice);
     }
 
-    private void applyServicesAndRecalculate(Invoice invoice, List<InvoiceItemRequest> services) {
+    // =========================
+    // PRIVATE HELPERS
+    // =========================
+
+    private void applyServicesAndRecalculate(Invoice invoice,
+                                             List<InvoiceItemRequest> services) {
+
         invoice.getServices().clear();
 
         List<InvoiceItem> items = new ArrayList<>();
+
         if (services != null) {
             for (InvoiceItemRequest req : services) {
-                BigDecimal rate = req.getRate() == null ? BigDecimal.ZERO : req.getRate();
-                int qty = req.getQuantity() == null ? 0 : req.getQuantity();
-                BigDecimal lineTotal = rate.multiply(BigDecimal.valueOf(qty));
+
+                BigDecimal rate = req.getRate() == null
+                        ? BigDecimal.ZERO : req.getRate();
+
+                int qty = req.getQuantity() == null
+                        ? 0 : req.getQuantity();
+
+                BigDecimal lineTotal =
+                        rate.multiply(BigDecimal.valueOf(qty));
 
                 InvoiceItem item = InvoiceItem.builder()
                         .invoice(invoice)
@@ -109,6 +187,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                         .quantity(qty)
                         .lineTotal(lineTotal)
                         .build();
+
                 items.add(item);
             }
         }
@@ -118,15 +197,22 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private BigDecimal recalculateTotal(List<InvoiceItem> items) {
+
         BigDecimal total = BigDecimal.ZERO;
-        if (items == null) return total;
+
+        if (items == null)
+            return total;
+
         for (InvoiceItem item : items) {
-            if (item.getLineTotal() != null) total = total.add(item.getLineTotal());
+            if (item.getLineTotal() != null)
+                total = total.add(item.getLineTotal());
         }
+
         return total;
     }
 
     private InvoiceResponse toResponse(Invoice inv) {
+
         List<InvoiceItemResponse> items = inv.getServices() == null
                 ? List.of()
                 : inv.getServices().stream().map(i ->
@@ -155,18 +241,26 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private String generateInvoiceNumber() {
-        // similar to "VARLBI4" from your screenshot
+
         final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();
 
         for (int attempt = 0; attempt < 10; attempt++) {
+
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 7; i++) sb.append(chars.charAt(random.nextInt(chars.length())));
+
+            for (int i = 0; i < 7; i++)
+                sb.append(chars.charAt(random.nextInt(chars.length())));
+
             String candidate = sb.toString();
-            if (!invoiceRepository.existsByInvoiceNumber(candidate)) return candidate;
+
+            if (!invoiceRepository.existsByInvoiceNumber(candidate))
+                return candidate;
         }
 
-        throw new CustomException("Could not generate invoice number", HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new CustomException(
+                "Could not generate invoice number",
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 }
-

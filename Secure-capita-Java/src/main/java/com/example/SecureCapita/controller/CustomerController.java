@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.SecureCapita.dto.CustomerInvoiceSummaryResponse;
+import com.example.SecureCapita.service.InvoiceService;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -28,6 +30,7 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final UserRepository userRepository;
+    private final InvoiceService invoiceService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<CustomerResponse>>> list(
@@ -50,6 +53,21 @@ public class CustomerController {
         User user = currentUser(authentication);
         CustomerResponse data = customerService.getCustomer(user, id);
         return ResponseEntity.ok(new ApiResponse<>(true, "Customer fetched successfully", data));
+    }
+
+    @GetMapping("/{customerId}/invoice-summary")
+    public ResponseEntity<ApiResponse<CustomerInvoiceSummaryResponse>> summary(
+            @PathVariable Long customerId,
+            Authentication authentication
+    ) {
+        User user = currentUser(authentication);
+
+        CustomerInvoiceSummaryResponse data =
+                invoiceService.getCustomerInvoiceSummary(user, customerId);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Invoice summary fetched successfully", data)
+        );
     }
 
     @PostMapping
